@@ -29,8 +29,11 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo $GITHUB_TOKEN | skopeo login -u "$REGISTRY_USER" --password-stdin ghcr.io
-          # I can't just use --digestfile "$GITHUB_OUTPUT" since that'll truncate it which I think is bad?
+          # provenance attestation action only looks in default docker config location :(
+          # https://github.com/sigstore/sigstore-js/blob/554f3cd250f80e373e777f617cad3fa387c674b1/packages/oci/src/credentials.ts#L34
+          echo "$GITHUB_TOKEN" | skopeo login -u "$REGISTRY_USER" --password-stdin --compat-auth-file="$HOME/.docker/config.json" ghcr.io
+
+          # I can't just use --digestfile "$GITHUB_OUTPUT" since that'll truncate it which I think is bad? docs are unclear as to whether $GITHUB_OUTPUT is shared
           $(nix build --print-out-paths ".#fragment-server-image") | gzip --fast | skopeo copy docker-archive:/dev/stdin "docker://${IMAGE_REPO}:server" --digestfile "$RUNNER_TEMP/digest"
           echo "digest=$(<${RUNNER_TEMP}/digest)" >> "$GITHUB_OUTPUT"
 
