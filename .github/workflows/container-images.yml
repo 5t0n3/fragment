@@ -13,18 +13,30 @@ jobs:
     permissions:
       contents: read
       packages: write
+      attestations: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Install Nix
         uses: cachix/install-nix-action@v26
 
-      - name: Build & Push Frontend Image
+      - name: Build & push frontend image
+        id: build
         env:
           REGISTRY_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: $(nix build --print-out-paths ".#fragment-frontend-image") | gzip --fast | skopeo copy --dest-creds "$REGISTRY_USER:$GITHUB_TOKEN" docker-archive:/dev/stdin "docker://${IMAGE_REPO}:frontend"
+        run: |
+          echo $GITHUB_TOKEN | skopeo login -u "$REGISTRY_USER" --password-stdin ghcr.io
+          # I can't just use --digestfile "$GITHUB_OUTPUT" since that'll truncate it which I think is bad?
+          $(nix build --print-out-paths ".#fragment-server-image") | gzip --fast | skopeo copy docker-archive:/dev/stdin "docker://${IMAGE_REPO}:server" --digestfile "$RUNNER_TEMP/digest"
+          echo "digest=$(<${RUNNER_TEMP}/digest)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate provenance attestation
+        uses: actions/attest-build-provenance@v1.1.0
+        with:
+          subject-name: ${{ env.IMAGE_REPO }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+        

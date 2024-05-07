@@ -41,12 +41,11 @@
           };
 
         packages = {
-          fragment-frontend = pkgs.callPackage ./frontend {};
-          fragment-frontend-image = pkgs.dockerTools.streamLayeredImage {
-            name = "fragment-frontend";
-            tag = "latest";
-            contents = [self'.packages.fragment-frontend];
-            config.Cmd = ["frontend"];
+          fragment-server = pkgs.callPackage ./server {};
+          fragment-server-image = pkgs.dockerTools.streamLayeredImage {
+            name = "fragment-server";
+            contents = [self'.packages.fragment-server];
+            config.Cmd = ["fragment-server"];
           };
         };
 
