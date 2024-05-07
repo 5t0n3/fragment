@@ -1,8 +1,5 @@
-# zig build output
-zig-cache/
-zig-out/
-build/
-build-*/
+# Rust build output
+target/
 
 # nix build output
 result
