@@ -7,10 +7,11 @@ env:
   IMAGE_REPO: ghcr.io/${{ github.repository }}
 
 jobs:
-  build-and-push-frontend:
+  build-and-push-server:
     runs-on: ubuntu-latest
 
     permissions:
+      id-token: write
       contents: read
       packages: write
       attestations: write
