@@ -1,32 +1,28 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = {self, nixpkgs, fenix}:
-    let system = "x86_64-linux";
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [fenix.overlays.default];
+  outputs = inputs@{flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = ["x86_64-linux"];
+
+      perSystem = {self', inputs', pkgs, ...}: {
+        devShells.default = pkgs.mkShell {
+          packages = [pkgs.zig];
         };
-        inherit (pkgs) mkShell;
-        rust = pkgs.fenix.complete.withComponents [
-          "cargo"
-          "clippy"
-          "rust-src"
-          "rustc"
-          "rustfmt"
-          "rust-analyzer"
-        ];
-    in {
-      devShells.${system}.default = mkShell {
-        packages = [rust];
+
+        packages = {
+          frontend = pkgs.callPackage ./frontend {};
+          frontend-image = pkgs.dockerTools.streamLayeredImage {
+            name = "fragment-frontend";
+            contents = [self'.packages.frontend];
+            config.Cmd = ["frontend"];
+          };
+        };
+
+        formatter = pkgs.alejandra;
       };
-      
-      formatter.${system} = pkgs.alejandra;
     };
 }

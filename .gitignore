@@ -1,2 +1,8 @@
-# rust build output
-target/
+# zig build output
+zig-cache/
+zig-out/
+build/
+build-*/
+
+# nix build output
+result
