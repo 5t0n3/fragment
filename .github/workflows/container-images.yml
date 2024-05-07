@@ -27,4 +27,4 @@ jobs:
         env:
           REGISTRY_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: $(nix build --print-out-paths ".#frontend-image") | gzip --fast | skopeo copy --dest-creds "$REGISTRY_USER:$GITHUB_TOKEN" docker-archive:/dev/stdin "docker://${IMAGE_REPO}:frontend"
+        run: $(nix build --print-out-paths ".#fragment-frontend-image") | gzip --fast | skopeo copy --dest-creds "$REGISTRY_USER:$GITHUB_TOKEN" docker-archive:/dev/stdin "docker://${IMAGE_REPO}:frontend"
