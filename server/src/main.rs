@@ -9,12 +9,16 @@ const ICON: &'static [u8] = include_bytes!("frontend/favicon.ico");
 
 #[get("/style.css")]
 async fn style() -> impl Responder {
-    HttpResponse::Ok().body(CSS)
+    HttpResponse::Ok()
+        .content_type(header::ContentType(mime::TEXT_CSS))
+        .body(CSS)
 }
 
 #[get("/index.js")]
 async fn script() -> impl Responder {
-    HttpResponse::Ok().body(CLIENT_SCRIPT)
+    HttpResponse::Ok()
+        .content_type(header::ContentType(mime::TEXT_JAVASCRIPT))
+        .body(CLIENT_SCRIPT)
 }
 
 #[get("/logo.png")]
@@ -56,6 +60,7 @@ async fn main() -> std::io::Result<()> {
             .service(style)
             .service(robots_txt)
             .service(logo)
+            .service(icon)
             .service(web::redirect("/", "/note"))
     })
     .bind(("127.0.0.1", 8080))?
