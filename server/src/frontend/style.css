@@ -26,12 +26,12 @@ label {
   font-size: 1.75rem;
 }
 
-input:focus, textarea:focus, #note-content:focus {
+input:focus, #note-content:focus {
   outline: none;
   box-shadow: 4px 4px #1B9226, 9px 9px black;
 }
 
-input, textarea, #note-content {
+input, #note-content {
   display: block;
   box-shadow: 4px 4px grey;
   margin: 0.5rem auto 1rem auto;
@@ -39,10 +39,6 @@ input, textarea, #note-content {
 
 input {
   font-size: 2rem;
-}
-
-textarea {
-  resize: none;
 }
 
 #input-container {
@@ -54,15 +50,6 @@ textarea {
 #content-container {
   min-height: 60%;
 }
-
-
-/*
-#note-content {
-  width: 90%;
-  min-height: 50vh;
-  font-size: 1rem;
-}
-*/
 
 #note-content {
   width: 90%;
@@ -79,4 +66,8 @@ textarea {
   font-size: 2rem;
   border: solid 2px var(--text);
   border-radius: 3px;
+}
+
+.underlined {
+  text-decoration: underline;
 }

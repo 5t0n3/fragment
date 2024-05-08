@@ -137,24 +137,37 @@ async function tryLoadNote() {
 
 function handleFormatKey(ev) {
     if (ev.ctrlKey && !ev.repeat) {
-        if (ev.key == "b") {
+        if (ev.key === "b") {
+            // bold
+            formatSelection("strong");
             ev.preventDefault();
-            boldSelection();
+        } else if (ev.key === "i") {
+            // italicize
+            formatSelection("em");
+            ev.preventDefault();
+        } else if (ev.key === "u") {
+            // underline
+            formatSelection("span", "underlined")
+            ev.preventDefault();
         }
-
-        // TODO: italics (em)/underline (span + css?)
     }
 }
 
-function boldSelection() {
+function formatSelection(formatTag, formatClass = "") {
     const selection = document.getSelection();
 
-    // TODO: toggle vs unconditionally bold
+    // TODO: toggle vs unconditionally format
     // TODO: handle cross-node cases
     // TODO: focus === anchor necessary?
     if (selection.rangeCount === 1 && selection.focusNode === selection.anchorNode) {
-        const boldEl = document.createElement("strong");
-        boldEl.textContent = selection.toString();
+        const formatEl = document.createElement(formatTag);
+
+        // allow for extra formatting
+        if (formatClass !== "") {
+            formatEl.classList.add(formatClass);
+        }
+
+        formatEl.textContent = selection.toString();
 
         // extract text on either side
         const focusOff = selection.focusOffset;
@@ -169,8 +182,8 @@ function boldSelection() {
 
         // do text replacement (why is there no insertAfter??)
         noteContent.replaceChild(afterText, selection.focusNode);
-        noteContent.insertBefore(boldEl, afterText);
-        noteContent.insertBefore(beforeText, boldEl);
+        noteContent.insertBefore(formatEl, afterText);
+        noteContent.insertBefore(beforeText, formatEl);
 
         // move cursor back to where it was
         if (begin === focusOff) {
