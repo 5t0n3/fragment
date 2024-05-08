@@ -181,9 +181,10 @@ function formatSelection(formatTag, formatClass = "") {
         const afterText = document.createTextNode(oldContent.slice(end));
 
         // do text replacement (why is there no insertAfter??)
-        noteContent.replaceChild(afterText, selection.focusNode);
-        noteContent.insertBefore(formatEl, afterText);
-        noteContent.insertBefore(beforeText, formatEl);
+        const parent = selection.focusNode.parentNode;
+        parent.replaceChild(afterText, selection.focusNode);
+        parent.insertBefore(formatEl, afterText);
+        parent.insertBefore(beforeText, formatEl);
 
         // move cursor back to where it was
         if (begin === focusOff) {

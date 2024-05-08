@@ -2,6 +2,8 @@ name: "Build & Push Container Images"
 on:
   push:
     branches: ["main"]
+  release:
+    types: [published]
 
 env:
   IMAGE_REPO: ghcr.io/${{ github.repository }}
@@ -29,10 +31,20 @@ jobs:
           REGISTRY_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "$GITHUB_TOKEN" | skopeo login -u "$REGISTRY_USER" --password-stdin ghcr.io
+          # using docker instead of skopeo for config reasons for the attestation push step
+          # the version of skopeo on the runner is old and doesn't seem to have the --compat-auth-file option (introduced in 1.15 maybe? runner has 1.4.1 :P)
+          echo "$GITHUB_TOKEN" | docker login -u "$REGISTRY_USER" --password-stdin ghcr.io
 
-          # I can't just use --digestfile "$GITHUB_OUTPUT" since that'll truncate it which I think is bad? docs are unclear as to whether $GITHUB_OUTPUT is shared between job steps
-          $(nix build --print-out-paths ".#fragment-server-image") | gzip --fast | skopeo copy docker-archive:/dev/stdin "docker://${IMAGE_REPO}:server" --digestfile "$RUNNER_TEMP/digest"
+          # TODO: release -> server-v<whatever> tag based on ${{ github.event_name }} -> $GITHUB_EVENT_NAME (release?) + $GITHUB_REF (refs/tags/<version>) or $GITHUB_REF_NAME?
+          # choose tag based on whether this is a release or just a normal commit
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            CONTAINER_TAG="server-${GITHUB_REF_NAME}"
+          else
+            CONTAINER_TAG=server
+          fi
+
+          # I can't just use --digestfile "$GITHUB_OUTPUT" since that'll truncate it which I think is bad? docs are unclear as to whether $GITHUB_OUTPUT is shared between job steps (not that it really matters in this case ig :P)
+          $(nix build --print-out-paths ".#fragment-server-image") | gzip --fast | skopeo copy docker-archive:/dev/stdin "docker://${IMAGE_REPO}:${CONTAINER_TAG}" --digestfile "$RUNNER_TEMP/digest"
           echo "digest=$(<${RUNNER_TEMP}/digest)" >> "$GITHUB_OUTPUT"
 
       - name: Generate provenance attestation
@@ -40,4 +52,5 @@ jobs:
         with:
           subject-name: ${{ env.IMAGE_REPO }}
           subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
         
