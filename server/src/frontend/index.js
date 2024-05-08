@@ -135,6 +135,54 @@ async function tryLoadNote() {
     noteContent.innerHTML = contents.body;
 }
 
+function handleFormatKey(ev) {
+    if (ev.ctrlKey && !ev.repeat) {
+        if (ev.key == "b") {
+            ev.preventDefault();
+            boldSelection();
+        }
+
+        // TODO: italics (em)/underline (span + css?)
+    }
+}
+
+function boldSelection() {
+    const selection = document.getSelection();
+
+    // TODO: toggle vs unconditionally bold
+    // TODO: handle cross-node cases
+    // TODO: focus === anchor necessary?
+    if (selection.rangeCount === 1 && selection.focusNode === selection.anchorNode) {
+        const boldEl = document.createElement("strong");
+        boldEl.textContent = selection.toString();
+
+        // extract text on either side
+        const focusOff = selection.focusOffset;
+        const anchorOff = selection.anchorOffset;
+
+        const begin = Math.min(focusOff, anchorOff);
+        const end = Math.max(focusOff, anchorOff);
+
+        const oldContent = selection.focusNode.textContent;
+        const beforeText = document.createTextNode(oldContent.slice(0, begin));
+        const afterText = document.createTextNode(oldContent.slice(end));
+
+        // do text replacement (why is there no insertAfter??)
+        noteContent.replaceChild(afterText, selection.focusNode);
+        noteContent.insertBefore(boldEl, afterText);
+        noteContent.insertBefore(beforeText, boldEl);
+
+        // move cursor back to where it was
+        if (begin === focusOff) {
+            // focus was at the beginning of the selection
+            selection.setPosition(beforeText, focusOff);
+        } else {
+            // focus was at end of selection
+            selection.setPosition(afterText);
+        }
+    }
+}
+
 addEventListener("DOMContentLoaded", ev => {
     const shareBtn = document.getElementById("share-button");
     shareBtn.addEventListener("click", ev => shareNote());
@@ -143,7 +191,6 @@ addEventListener("DOMContentLoaded", ev => {
     if (location.hash !== "") {
         tryLoadNote().catch(err => alert("Oops, something went wrong when loading your note. Please make sure you have the right password & link and reload the page to try again."));
     }
-});
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event
-// https://w3collective.com/keyboard-shortcuts-javascript/
+    noteContent.addEventListener("keydown", handleFormatKey);
+});
