@@ -35,7 +35,6 @@ jobs:
           # the version of skopeo on the runner is old and doesn't seem to have the --compat-auth-file option (introduced in 1.15 maybe? runner has 1.4.1 :P)
           echo "$GITHUB_TOKEN" | docker login -u "$REGISTRY_USER" --password-stdin ghcr.io
 
-          # TODO: release -> server-v<whatever> tag based on ${{ github.event_name }} -> $GITHUB_EVENT_NAME (release?) + $GITHUB_REF (refs/tags/<version>) or $GITHUB_REF_NAME?
           # choose tag based on whether this is a release or just a normal commit
           if [ "$GITHUB_EVENT_NAME" = "release" ]; then
             CONTAINER_TAG="server-${GITHUB_REF_NAME}"
@@ -53,4 +52,3 @@ jobs:
           subject-name: ${{ env.IMAGE_REPO }}
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
-        

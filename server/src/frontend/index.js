@@ -1,3 +1,5 @@
+"use strict";
+
 const noteTitle = document.getElementById("note-title");
 const noteContent = document.getElementById("note-content");
 
@@ -106,7 +108,7 @@ async function shareNote() {
     const result = await compressBytesToBase64(salt, iv, ct);
     navigator.clipboard.writeText(`${location.origin}/note#${result}`);
 
-    alert("Note URL copied to your clipboard! You can paste it elsewhere to share it with other people.");
+    alert("Note URL copied to your clipboard! You can paste it elsewhere to share it with other people.\n\nYour note is protected by secure encryption, so only the people you share your password with can read it. Make sure to remember your password though, since if you forget it you will lose your note contents forever!");
   }
 }
 
