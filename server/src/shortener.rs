@@ -1,3 +1,5 @@
+use std::error::Error;
+
 pub mod types {
     use serde::{Deserialize, Serialize};
 
@@ -23,40 +25,35 @@ pub mod types {
 
 use types::*;
 
-pub async fn expand_shortcode(shortcode: &str) -> Option<String> {
-    let shortener_url = std::env::var("SHORTENER_URL").ok()?;
+pub async fn expand_url(short_url: &str) -> Result<String, Box<dyn Error>> {
+    let shortener_url = std::env::var("SHORTENER_URL")?;
 
     let client = awc::Client::new();
     let expand_body = ShortenerRequest {
-        url: shortcode.to_owned(),
+        url: short_url.to_owned(),
     };
 
-    let response: LengthenResponse = client
+    client
         .get(shortener_url + "/lengthen/")
-        .query(&expand_body)
-        .ok()?
+        .query(&expand_body)?
         .send()
-        .await
-        .ok()?
-        .json()
-        .await
-        .ok()?;
-
-    response.long
+        .await?
+        .json::<LengthenResponse>()
+        .await?
+        .long
+        .ok_or("URL not found".into())
 }
 
-pub async fn shorten_url(shorten_req: &ShortenerRequest) -> Option<String> {
-    let shortener_url = std::env::var("SHORTENER_URL").ok()?;
+pub async fn shorten_url(shorten_req: &ShortenerRequest) -> Result<String, Box<dyn Error>> {
+    let shortener_url = std::env::var("SHORTENER_URL")?;
 
     let client = awc::Client::new();
-    let response: ShortenResponse = client
+    let resp = client
         .post(shortener_url + "/shorten/")
         .send_json(shorten_req)
-        .await
-        .ok()?
-        .json()
-        .await
-        .ok()?;
+        .await?
+        .json::<ShortenResponse>()
+        .await?;
 
-    Some(response.short)
+    Ok(resp.short)
 }

@@ -1,6 +1,7 @@
 use actix_web::{
     get, http::header, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
 };
+use log::{debug, info};
 
 mod shortener;
 use shortener::types::ShortenerRequest;
@@ -61,8 +62,11 @@ async fn expand_url(req: HttpRequest) -> HttpResponse {
     if let Ok(fragment_url) = std::env::var("FRAGMENT_URL") {
         let full_url = format!("{fragment_url}{}", req.uri());
 
-        shortener::expand_shortcode(&full_url).await.map_or_else(
-            || HttpResponse::NotFound().body("Short URL not found"),
+        shortener::expand_url(&full_url).await.map_or_else(
+            |err| {
+                debug!("Error when expanding short URL: {}", err.to_string());
+                HttpResponse::NotFound().body("Short URL not found")
+            },
             |target| {
                 HttpResponse::TemporaryRedirect()
                     .insert_header((header::LOCATION, target))
@@ -85,7 +89,8 @@ async fn shorten_url(shorten_body: web::Json<ShortenerRequest>) -> HttpResponse 
         } else {
             // just forward request directly to shortener microservice
             shortener::shorten_url(&inner_req).await.map_or_else(
-                || {
+                |err| {
+                    debug!("Error when expanding short URL: {}", err.to_string());
                     HttpResponse::InternalServerError()
                         .body("Internal server error when shortening URL")
                 },
@@ -99,6 +104,11 @@ async fn shorten_url(shorten_body: web::Json<ShortenerRequest>) -> HttpResponse 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // use custom environment varaible for logging
+    let log_env = env_logger::Env::default().filter_or("FRAGMENT_LOG_LEVEL", "info");
+    env_logger::init_from_env(log_env);
+
+    info!("Logging initialized! Binding to port 8080...");
     HttpServer::new(|| {
         App::new()
             .service(index)
