@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>fragment - account management</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="style.css" rel="stylesheet" />
+  <link rel="icon" href="favicon.ico" />
+</head>
+<body>
+  <img src="logo.png" alt="fragment logo" height="100px" />
+
+  <form>
+    <label for="username">username:</label>
+    <input id="username" name="username" />
+    <label for="pass">password:</label>
+    <input type="password" id="pass" name="pass" />
+
+    <div>
+      <button class="account-btn" id="register" formaction="/auth/register">register</button>
+      <button class="account-btn" id="login" formaction="/auth/login">log in</button>
+    </div>
+  </form>
+
+  <script src="account.js" integrity="sha512-MFBmXGlaPwEOA3ufU0xniSJBPkNEtUb3uNnkOA/13oJ77aQMMlNRP+6qUbyyHmmh9+7GPP/esvt3N2ZyR8Xt9Q=="></script>
+</body>

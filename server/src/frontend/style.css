@@ -71,3 +71,7 @@ input {
 .underlined {
   text-decoration: underline;
 }
+
+button#account-btn {
+  font-size: 16pt;
+}

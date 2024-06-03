@@ -8,6 +8,8 @@ use shortener::types::ShortenerRequest;
 
 // disk reads are slow right? :^)
 const INDEX_HTML: &str = include_str!("frontend/index.html");
+const ACCOUNT_HTML: &str = include_str!("frontend/account.html");
+const ACCOUNT_JS: &str = include_str!("frontend/account.js");
 const CSS: &str = include_str!("frontend/style.css");
 const CLIENT_SCRIPT: &str = include_str!("frontend/index.js");
 const LOGO: &[u8] = include_bytes!("frontend/logo.png");
@@ -46,7 +48,7 @@ async fn index() -> impl Responder {
             // only allow scripts/styles/images from this server (i.e. no inline/external stuff)
             header::CONTENT_SECURITY_POLICY,
             header::HeaderValue::from_static(
-                "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'",
+                "default-src 'none'; script-src 'sha512-Qh5B5AnswPBE6H4B0NOXoW/SyKSRZIdLUgQ/ZS3+GAp2m8wjYHEv5s6qPtVtcWATenDnU9BjKay/jugU8XGobQ=='; style-src 'self'; img-src 'self'",
             ),
         ))
         .body(INDEX_HTML)
@@ -55,6 +57,26 @@ async fn index() -> impl Responder {
 #[get("/robots.txt")]
 async fn robots_txt() -> impl Responder {
     HttpResponse::Ok().body("User-agent: *\nDisallow: /")
+}
+
+#[get("/account.js")]
+async fn account_js() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type(header::ContentType(mime::TEXT_JAVASCRIPT))
+        .body(ACCOUNT_JS)
+}
+
+#[get("/account")]
+async fn account_page() -> impl Responder {
+    HttpResponse::Ok()
+        .insert_header((
+            // match CSP for index
+            header::CONTENT_SECURITY_POLICY,
+            header::HeaderValue::from_static(
+                "default-src 'none'; script-src 'sha512-MFBmXGlaPwEOA3ufU0xniSJBPkNEtUb3uNnkOA/13oJ77aQMMlNRP+6qUbyyHmmh9+7GPP/esvt3N2ZyR8Xt9Q=='; style-src 'self'; img-src 'self'; connect-src 'self'",
+            ),
+        ))
+        .body(ACCOUNT_HTML)
 }
 
 #[get("/s/{code}")]
@@ -112,6 +134,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(index)
+            .service(account_page)
+            .service(account_js)
             .service(script)
             .service(style)
             .service(robots_txt)
