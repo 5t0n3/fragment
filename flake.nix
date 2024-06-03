@@ -44,6 +44,7 @@
           fragment-server = pkgs.callPackage ./server {};
           fragment-server-image = pkgs.dockerTools.streamLayeredImage {
             name = "fragment-server";
+            tag = "latest";
             contents = [self'.packages.fragment-server];
             config.Cmd = ["fragment-server"];
           };

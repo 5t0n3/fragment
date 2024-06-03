@@ -1,0 +1,54 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.0.3 (and modified by hand)
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    io.kubernetes.cri-o.SandboxID/fragment-server: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.kubernetes.cri-o.SandboxID/url-shortener: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.kubernetes.cri-o.SandboxID/rember: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.kubernetes.cri-o.SandboxID/unlikely: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.kubernetes.cri-o.SandboxID/takethis: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.kubernetes.cri-o.SandboxID/ingress: 61ce842c6cf622bf028cb513dd21081928e08a00df6a10366d2534c39162e612
+    io.podman.annotations.autoremove/fragment-server: "TRUE"
+    io.podman.annotations.autoremove/url-shortener: "TRUE"
+    io.podman.annotations.autoremove/rember: "TRUE"
+    io.podman.annotations.autoremove/unlikely: "TRUE"
+    io.podman.annotations.autoremove/takethis: "TRUE"
+    io.podman.annotations.autoremove/ingress: "TRUE"
+  labels:
+    app: fragment-dev
+  name: fragment-dev
+spec:
+  containers:
+  - env:
+    - name: FRAGMENT_URL
+      value: http://localhost:8080/
+    - name: SHORTENER_URL
+      value: http://localhost:5000/
+    image: localhost/fragment-server:latest
+    name: fragment-server
+    ports:
+    - containerPort: 8080
+      hostPort: 8080
+  - env:
+    - name: URL_PREFIX
+      value: http://localhost:8080/
+    image: ghcr.io/5t0n3/fragment:url-shortener
+    name: url-shortener
+  - image: ghcr.io/5t0n3/rember:latest
+    name: rember
+  - image: ghcr.io/5t0n3/unlikely:latest
+    name: unlikely
+  - env:
+    - name: TOKEN
+      value: test-token-please-dont-use-ever
+    image: ghcr.io/5t0n3/takethis:latest
+    name: takethis
+  - image: localhost/fragment-ingress:latest
+    name: ingress
+    ports:
+    - containerPort: 8000
+      hostPort: 8000
