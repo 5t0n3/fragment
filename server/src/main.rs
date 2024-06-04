@@ -48,7 +48,7 @@ async fn index() -> impl Responder {
             // only allow scripts/styles/images from this server (i.e. no inline/external stuff)
             header::CONTENT_SECURITY_POLICY,
             header::HeaderValue::from_static(
-                "default-src 'none'; script-src 'sha512-Qh5B5AnswPBE6H4B0NOXoW/SyKSRZIdLUgQ/ZS3+GAp2m8wjYHEv5s6qPtVtcWATenDnU9BjKay/jugU8XGobQ=='; style-src 'self'; img-src 'self'",
+                "default-src 'none'; script-src 'sha512-a8Wmtiu8mZ0i0NpZ50lKqQqMJLUpvoUVrZRkmyo8CUpOioy/9VljKAh3CjEpr97b0Jr9jhqT8Bzd5Za9ihcG2Q=='; style-src 'self'; img-src 'self'; connect-src 'self'",
             ),
         ))
         .body(INDEX_HTML)
@@ -73,7 +73,7 @@ async fn account_page() -> impl Responder {
             // match CSP for index
             header::CONTENT_SECURITY_POLICY,
             header::HeaderValue::from_static(
-                "default-src 'none'; script-src 'sha512-MFBmXGlaPwEOA3ufU0xniSJBPkNEtUb3uNnkOA/13oJ77aQMMlNRP+6qUbyyHmmh9+7GPP/esvt3N2ZyR8Xt9Q=='; style-src 'self'; img-src 'self'; connect-src 'self'",
+                "default-src 'none'; script-src 'sha512-xHhCiHe3DywvoyeuaH64ego0omq0SspLY2745+AHZzBzooOj2I08JLGbY8fLqkR+hhvR9gEWjnUtMdAi+sLRyw=='; style-src 'self'; img-src 'self'; connect-src 'self'",
             ),
         ))
         .body(ACCOUNT_HTML)

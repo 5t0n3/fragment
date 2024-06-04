@@ -13,6 +13,9 @@ registerBtn.addEventListener("click", ev => {
     })
   }).then(resp => {
     if (resp.ok) {
+      // indicate logged in status in session storage (cookie is httponly)
+      window.sessionStorage.setItem("authenticated", true);
+
       // session cookie will already be set
       window.location.assign("/");
     } else {
@@ -31,6 +34,8 @@ loginBtn.addEventListener("click", ev => {
     })
   }).then(resp => {
     if (resp.ok) {
+      window.sessionStorage.setItem("authenticated", true);
+
       // session cookie will be set by fetch
       window.location.assign("/");
     } else {
