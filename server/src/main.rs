@@ -48,7 +48,7 @@ async fn index() -> impl Responder {
             // only allow scripts/styles/images from this server (i.e. no inline/external stuff)
             header::CONTENT_SECURITY_POLICY,
             header::HeaderValue::from_static(
-                "default-src 'none'; script-src 'sha512-a8Wmtiu8mZ0i0NpZ50lKqQqMJLUpvoUVrZRkmyo8CUpOioy/9VljKAh3CjEpr97b0Jr9jhqT8Bzd5Za9ihcG2Q=='; style-src 'self'; img-src 'self'; connect-src 'self'",
+                "default-src 'none'; script-src 'sha512-CQQdnUjt8wXDixXBLy8Rw73Kpfe9/+uBcp2OmrB/J52G2IaRhDSM6b5gn6kARGqmNuW9OQmnXP+OXOG8ZXwVuA=='; style-src 'self'; img-src 'self'; connect-src 'self'",
             ),
         ))
         .body(INDEX_HTML)

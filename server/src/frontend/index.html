@@ -25,13 +25,18 @@
       <div contenteditable id="note-content" spellcheck="false"></div>
     </div>
 
-    <div>
-      <label for="passphrase-gen">Auto-generate memorable passphrase?</label>
-      <input id="passphrase-gen" type="checkbox" checked />
+    <label for="passphrase-gen">Auto-generate memorable passphrase?</label>
+    <input id="passphrase-gen" type="checkbox" checked />
+
+    <div id="upload-container">
+      <label for="file-upload">Attachment (optional)</label>
+      <input id="file-upload" type="file" />
     </div>
+
+    <a class="hidden" id="attachment-link">Attachment link</a>
 
     <button id="share-button">Share note</button>
   </main>
-  <script src="index.js" integrity="sha512-a8Wmtiu8mZ0i0NpZ50lKqQqMJLUpvoUVrZRkmyo8CUpOioy/9VljKAh3CjEpr97b0Jr9jhqT8Bzd5Za9ihcG2Q=="></script>
+  <script src="index.js" integrity="sha512-CQQdnUjt8wXDixXBLy8Rw73Kpfe9/+uBcp2OmrB/J52G2IaRhDSM6b5gn6kARGqmNuW9OQmnXP+OXOG8ZXwVuA=="></script>
 </body>
 </html>

@@ -42,10 +42,7 @@ spec:
     name: rember
   - image: ghcr.io/5t0n3/unlikely:latest
     name: unlikely
-  - env:
-    - name: TOKEN
-      value: test-token-please-dont-use-ever
-    image: ghcr.io/5t0n3/takethis:latest
+  - image: ghcr.io/5t0n3/takethis:latest
     name: takethis
   - image: localhost/fragment-ingress:latest
     name: ingress

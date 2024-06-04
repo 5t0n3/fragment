@@ -3,6 +3,9 @@
 const noteTitle = document.getElementById("note-title");
 const noteContent = document.getElementById("note-content");
 const genPassphraseBox = document.getElementById("passphrase-gen");
+const fileUpload = document.getElementById("file-upload");
+const uploadContainer = document.getElementById("upload-container");
+const attachmentLink = document.getElementById("attachment-link");
 
 // why these don't just use static methods I have no idea
 const encoder = new TextEncoder();
@@ -75,6 +78,21 @@ async function shareNote() {
   if (noteTitle.value === "" || noteContent.textContent === "") {
     alert("Make sure you enter both a title and some content before sharing!");
   } else {
+    // upload attachment if present
+    let fileId = "";
+    const attachmentList = fileUpload.files;
+    if (attachmentList.length > 0) {
+        const reqData = new FormData();
+        reqData.append("file", attachmentList[0]);
+        
+        const uploadResp = await fetch("/attachments/upload", {
+            method: "POST",
+            body: reqData
+        });
+
+        fileId = await uploadResp.text();
+    }
+      
     // place note content into stringified JSON object
     const noteData = {
       title: noteTitle.value,
@@ -82,6 +100,11 @@ async function shareNote() {
       // a CSP policy is enforced by the server to mitigate XSS
       body: noteContent.innerHTML
     };
+
+    if (fileId !== "") {
+        noteData.fileId = fileId;
+    }
+    
     const dataStr = JSON.stringify(noteData);
 
     let password = "";
@@ -163,6 +186,15 @@ async function tryLoadNote() {
     // render note contents onto webpage
     noteTitle.value = contents.title;
     noteContent.innerHTML = contents.body;
+
+    // also attempt to recover attachment, if present
+    if (Object.hasOwn(contents, "fileId")) {
+        const fileId = contents.fileId;
+        attachmentLink.href = `${window.location.origin}/attachments/${fileId}`;
+        attachmentLink.style.display = "inline";
+
+        uploadContainer.style.display = "none";
+    }
 }
 
 function handleFormatKey(ev) {
