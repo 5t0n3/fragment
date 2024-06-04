@@ -1,11 +1,16 @@
 "use strict";
 
+const shareBtn = document.getElementById("share-button");
 const noteTitle = document.getElementById("note-title");
 const noteContent = document.getElementById("note-content");
 const genPassphraseBox = document.getElementById("passphrase-gen");
 const fileUpload = document.getElementById("file-upload");
 const uploadContainer = document.getElementById("upload-container");
+const attachmentContainer = document.getElementById("attachment-container");
 const attachmentLink = document.getElementById("attachment-link");
+const shortenToggle = document.getElementById("shorten-toggle");
+const shortenContainer = document.getElementById("shorten-container");
+const passphraseContainer = document.getElementById("passphrase-container");
 
 // why these don't just use static methods I have no idea
 const encoder = new TextEncoder();
@@ -139,7 +144,21 @@ async function shareNote() {
 
     // write resulting URL to clipboard
     const result = await compressBytesToBase64(salt, iv, ct);
-    const noteURL = `${location.origin}/note#${result}`;
+    let noteURL = `${location.origin}/note#${result}`;
+
+    if (shortenToggle.checked) {
+        const shortenResp = await fetch("/shorten", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: noteURL
+            })
+        });
+        noteURL = await shortenResp.text();
+    }
+    
     navigator.clipboard.writeText(noteURL);
 
     let alertMsg = "Note URL copied to your clipboard! You can paste it elsewhere to share it with other people.\n\nYour note is protected by secure encryption, so only the people you share your password with can read it. Make sure to remember your password though, since if you forget it you will lose your note contents forever!";
@@ -191,10 +210,16 @@ async function tryLoadNote() {
     if (Object.hasOwn(contents, "fileId")) {
         const fileId = contents.fileId;
         attachmentLink.href = `${window.location.origin}/attachments/${fileId}`;
-        attachmentLink.style.display = "inline";
+        attachmentContainer.style.display = "block";
 
         uploadContainer.style.display = "none";
     }
+
+    // also hide share button/passphrase tickbox
+    passphraseContainer.style.display = "none";
+    shareBtn.style.display = "none";
+    uploadContainer.style.display = "none";
+    shortenContainer.style.display = "none";
 }
 
 function handleFormatKey(ev) {
@@ -264,11 +289,14 @@ addEventListener("DOMContentLoaded", ev => {
 
     // hide login header if logged in
     if (loggedIn) {
-        const header = document.getElementById("login-header");
-        header.style.display = "none";
+        const loginHeader = document.getElementById("login-header");
+        loginHeader.style.display = "none";
+
+        // also display list header
+        const listHeader = document.getElementById("list-header");
+        listHeader.style.display = "block";
     }
     
-    const shareBtn = document.getElementById("share-button");
     shareBtn.addEventListener("click", ev => shareNote());
 
     // attempt to load note from hash

@@ -25,9 +25,11 @@ spec:
   containers:
   - env:
     - name: FRAGMENT_URL
-      value: http://localhost:8080/
+      value: http://localhost:8000
     - name: SHORTENER_URL
       value: http://localhost:5000/
+    - name: FRAGMENT_LOG_LEVEL
+      value: debug
     image: localhost/fragment-server:latest
     name: fragment-server
     ports:
@@ -35,7 +37,7 @@ spec:
       hostPort: 8080
   - env:
     - name: URL_PREFIX
-      value: http://localhost:8080/
+      value: http://localhost:8000/s/
     image: ghcr.io/5t0n3/fragment:url-shortener
     name: url-shortener
   - image: ghcr.io/5t0n3/rember:latest

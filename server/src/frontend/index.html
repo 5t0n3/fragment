@@ -12,6 +12,10 @@
     <a href="/account">log in or register</a>
   </header>
 
+  <header id="list-header" class="hidden">
+    <a href="/list">view your stored notes</a>
+  </header>
+
   <img src="logo.png" alt="fragment logo" height="100px" />
 
   <main id="input-container">
@@ -25,18 +29,25 @@
       <div contenteditable id="note-content" spellcheck="false"></div>
     </div>
 
-    <label for="passphrase-gen">Auto-generate memorable passphrase?</label>
-    <input id="passphrase-gen" type="checkbox" checked />
+    <div id="passphrase-container">
+      <label for="passphrase-gen">Auto-generate memorable passphrase?</label>
+      <input id="passphrase-gen" type="checkbox" checked />
+    </div>
+
+    <div id="shorten-container">
+      <label for="shorten-toggle">Shorten note link?</label>
+      <input id="shorten-toggle" type="checkbox" />
+    </div>
 
     <div id="upload-container">
       <label for="file-upload">Attachment (optional)</label>
       <input id="file-upload" type="file" />
     </div>
 
-    <a class="hidden" id="attachment-link">Attachment link</a>
+    <p id="attachment-container" class="hidden"><a id="attachment-link">Attachment link</a></p>
 
     <button id="share-button">Share note</button>
   </main>
-  <script src="index.js" integrity="sha512-CQQdnUjt8wXDixXBLy8Rw73Kpfe9/+uBcp2OmrB/J52G2IaRhDSM6b5gn6kARGqmNuW9OQmnXP+OXOG8ZXwVuA=="></script>
+  <script src="index.js" integrity="sha512-pKjv7qPE9+Ei0Q0xNpAw9+6z5Fj4mEE7TnTKXExu9ZYk3s9FG7idOXGgIEYAoSxwUlgjyEbvMZalK14rsPvuBg=="></script>
 </body>
 </html>

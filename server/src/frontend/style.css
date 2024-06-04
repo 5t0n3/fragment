@@ -53,7 +53,7 @@ input {
 
 #note-content {
   width: 90%;
-  min-height: 40vh;
+  min-height: 30vh;
   margin: 0.5rem auto 1.5rem auto;
   background: white;
   border-radius: 3px;
